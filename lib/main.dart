@@ -1,9 +1,15 @@
 import 'package:chat_app/firebase_options.dart';
 import 'package:chat_app/pages/age_page.dart';
-import 'package:chat_app/pages/create_account_page.dart';
+import 'package:chat_app/pages/chat_page.dart';
 import 'package:chat_app/pages/email_page.dart';
+import 'package:chat_app/pages/menu_page.dart';
+import 'package:chat_app/pages/people_page.dart';
+import 'package:chat_app/pages/home_page.dart';
 import 'package:chat_app/pages/login_page.dart';
 import 'package:chat_app/pages/name_page.dart';
+import 'package:chat_app/pages/password_page.dart';
+import 'package:chat_app/pages/profile_page.dart';
+import 'package:chat_app/pages/requests_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
@@ -25,12 +31,20 @@ class ChatApp extends StatelessWidget {
       routes: {
         // Define the routes for the application
         LoginPage.id: (context) => LoginPage(),
-        CreateAccountPage.id: (context) => CreateAccountPage(),
         NamePage.id: (context) => NamePage(),
         AgePage.id: (context) => AgePage(),
         EmailPage.id: (context) => EmailPage(),
+        PasswordPage.id: (context) => PasswordPage(),
+        HomePage.id : (context) => HomePage(),
+        PeoplePage.id : (context) => PeoplePage(),
+        MenuPage.id : (context) => MenuPage(),
+        ChatPage.id : (context) => ChatPage(),
+        ProfilePage.id : (context) => ProfilePage(),
+        RequestsPage.id : (context) => RequestsPage(),
       },
       initialRoute: LoginPage.id,
     );
   }
 }
+
+

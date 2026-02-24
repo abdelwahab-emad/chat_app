@@ -1,5 +1,7 @@
 import 'package:chat_app/constants.dart';
+import 'package:chat_app/models/user_data.dart';
 import 'package:chat_app/pages/login_page.dart';
+import 'package:chat_app/pages/password_page.dart';
 import 'package:chat_app/widgets/custom_button.dart';
 import 'package:chat_app/widgets/custom_text_field.dart';
 import 'package:flutter/material.dart';
@@ -8,28 +10,44 @@ class EmailPage extends StatefulWidget {
   const EmailPage({super.key});
 
   static const String id = 'email_page';
-  
+
   @override
   State<EmailPage> createState() => _EmailPageState();
 }
 
 class _EmailPageState extends State<EmailPage> {
-
   final TextEditingController emailController = TextEditingController();
   String? errMessage;
-  void validateAndProceed() {
-    setState(() {
-      if (emailController.text.isEmpty) {
+
+  void validateAndProceed(UserData userData) {
+    if (emailController.text.isEmpty) {
+      setState(() {
         errMessage = 'Please enter your email';
-      } else {
-        //to next page
-        errMessage = null;
-      }
+      });
+      return;
+    }
+
+    setState(() {
+      errMessage = null;
     });
+
+    userData.email = emailController.text;
+
+    Navigator.pushNamed(context, PasswordPage.id, arguments: userData);
+  }
+
+  @override
+  void dispose() {
+    // Important: release memory for controllers
+    emailController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    
+    final userData = ModalRoute.of(context)!.settings.arguments as UserData;
+    
     return Scaffold(
       backgroundColor: Color(kprimaryColor),
       appBar: AppBar(
@@ -44,26 +62,19 @@ class _EmailPageState extends State<EmailPage> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Text(
-              "What's your email?",
+              "What's your email address?",
               style: TextStyle(color: Colors.white, fontSize: 24),
             ),
           ),
-          SizedBox(height: 8),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Text(
-              'Enter your email.',
-              style: TextStyle(color: Colors.white, fontSize: 16),
-            ),
-          ),
+
           SizedBox(height: 20),
           CustomTextField(
-            hintText: 'Email',
+            hintText: 'email address',
             controller: emailController,
             hasError: errMessage != null,
           ),
           SizedBox(height: 10),
-            if (errMessage != null) ...[
+          if (errMessage != null) ...[
             SizedBox(height: 5),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -78,8 +89,8 @@ class _EmailPageState extends State<EmailPage> {
             text: 'Next',
             boxColor: Color(0xFF0865FE),
             textColor: Colors.white,
-            onTap: validateAndProceed,
-          ),  
+            onTap: () => validateAndProceed(userData),
+          ),
           Spacer(),
           CustomButton(
             text: 'already have account',

@@ -1,4 +1,5 @@
 import 'package:chat_app/constants.dart';
+import 'package:chat_app/models/user_data.dart';
 import 'package:chat_app/pages/email_page.dart';
 import 'package:chat_app/pages/login_page.dart';
 import 'package:chat_app/widgets/custom_button.dart';
@@ -8,31 +9,44 @@ import 'package:flutter/material.dart';
 class AgePage extends StatefulWidget {
   const AgePage({super.key});
 
-  static const String id = 'date_page';
+  static const String id = 'age_page';
 
   @override
-  State<AgePage> createState() => _BirthDatePageState();
+  State<AgePage> createState() => _AgePageState();
 }
 
-class _BirthDatePageState extends State<AgePage> {
-
+class _AgePageState extends State<AgePage> {
   final TextEditingController ageController = TextEditingController();
   String? errMessage;
-  void validateAndProceed() {
+  
+  
+  void validateAndProceed(UserData userData) {
+
+    if(ageController.text.isEmpty){
+      setState(() {
+        errMessage = 'Please enter a valid number';
+      });
+      return;
+    }
     setState(() {
-      if (ageController.text.isEmpty) {
-        errMessage = 'Please enter your age';
-      } else {
-        //to next page
-        errMessage = null;
-        Navigator.pushNamed(context, EmailPage.id);
-      }
+      errMessage = null;
     });
+
+    userData.age = int.tryParse(ageController.text);
+    Navigator.pushNamed(context, EmailPage.id, arguments: userData);
   }
 
+  @override
+  void dispose() {
+    // Important: release memory for controllers
+    ageController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    //recive datauser from Namepage
+    final userData = ModalRoute.of(context)!.settings.arguments as UserData;
     return Scaffold(
       backgroundColor: Color(kprimaryColor),
       appBar: AppBar(
@@ -51,23 +65,16 @@ class _BirthDatePageState extends State<AgePage> {
               style: TextStyle(color: Colors.white, fontSize: 24),
             ),
           ),
-          SizedBox(height: 8),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Text(
-              'Enter your age.',
-              style: TextStyle(color: Colors.white, fontSize: 16),
-            ),
-          ),
-          SizedBox(height: 20),
+
+          const SizedBox(height: 20),
           CustomTextField(
             hintText: 'Age',
             controller: ageController,
             hasError: errMessage != null,
           ),
-          SizedBox(height: 10),
-            if (errMessage != null) ...[
-            SizedBox(height: 5),
+          const SizedBox(height: 10),
+          if (errMessage != null) ...[
+            const SizedBox(height: 5),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Text(
@@ -76,14 +83,14 @@ class _BirthDatePageState extends State<AgePage> {
               ),
             ),
           ],
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           CustomButton(
             text: 'Next',
             boxColor: Color(0xFF0865FE),
             textColor: Colors.white,
-            onTap: validateAndProceed,
-          ),  
-          Spacer(),
+            onTap:  () => validateAndProceed(userData),
+          ),
+          const Spacer(),
           CustomButton(
             text: 'already have account',
             boxColor: Color(kprimaryColor),
@@ -96,7 +103,7 @@ class _BirthDatePageState extends State<AgePage> {
               );
             },
           ),
-          SizedBox(height: 35),
+          const SizedBox(height: 35),
         ],
       ),
     );
