@@ -1,12 +1,14 @@
 import 'package:chat_app/constants.dart';
+import 'package:chat_app/cubits/auth_cubit/auth_cubit.dart';
 import 'package:chat_app/models/user_data.dart';
 import 'package:chat_app/pages/home_page.dart';
 import 'package:chat_app/pages/name_page.dart';
 import 'package:chat_app/widgets/custom_button.dart';
+import 'package:chat_app/widgets/custom_snackbar.dart';
 import 'package:chat_app/widgets/custom_text_field.dart';
 import 'package:chat_app/widgets/login_app_bar.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -18,114 +20,124 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final TextEditingController emailAddressController = TextEditingController();
+  final GlobalKey<FormState> formkey = GlobalKey();
+  final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  bool isPasswordObscure = true;
 
-  String? errMessage;
-  bool isLoading = false;
-
-  Future<void> login() async {
-    if (emailAddressController.text.isEmpty &&
-        passwordController.text.isEmpty) {
-      setState(() {
-        errMessage = 'please enter your email address and password';
-      });
-      return;
-    } else if (emailAddressController.text.isEmpty) {
-      setState(() {
-        errMessage = 'please enter your email address';
-      });
-      return;
-    } else if (passwordController.text.isEmpty) {
-      setState(() {
-        errMessage = 'please enter your password';
-      });
-      return;
-    }
-    setState(() {
-      errMessage = null;
-      isLoading = true;
-    });
-
-    try {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: emailAddressController.text.trim(),
-        password: passwordController.text.trim(),
-      );
-
-      //success
-      Navigator.pushNamedAndRemoveUntil(context, HomePage.id, (route) => false);
-    } on FirebaseAuthException catch (e) {
-      setState(() {
-        errMessage = e.message ?? 'Login failed';
-      });
-    } finally {
-      setState(() {
-        isLoading = false;
-      });
-    }
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Color(0xFF0C151A),
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(220),
-        child: LoginAppBar(),
-      ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.only(bottom: 50),
-        child: Column(
-          children: [
-            const SizedBox(height: 70),
-            CustomTextField(
-              hintText: 'email address',
-              controller: emailAddressController,
-              hasError:
-                  errMessage != null && emailAddressController.text.isEmpty,
-            ),
-            const SizedBox(height: 10),
-            CustomTextField(
-              hintText: 'password',
-              controller: passwordController,
-              hasError: errMessage != null && passwordController.text.isEmpty,
-            ),
-            const SizedBox(height: 10),
-            if (errMessage != null) ...[
-              SizedBox(height: 5),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    errMessage!,
-                    style: TextStyle(color: Colors.red, fontSize: 14),
+    return BlocConsumer<AuthCubit, AuthState>(
+      listener: (context, state) {
+        if (state is LoginSuccess) {
+          Navigator.pushNamedAndRemoveUntil(
+            context,
+            HomePage.id,
+            (route) => false,
+          );
+        } else if (state is LoginFailure) {
+          showCustomSnackBar(context, state.errorMessage);
+        }
+      },
+      builder: (context, state) {
+        return Scaffold(
+          backgroundColor: const Color(0xFF0C151A),
+          appBar: PreferredSize(
+            preferredSize: Size.fromHeight(220),
+            child: LoginAppBar(),
+          ),
+          body: SingleChildScrollView(
+            padding: const EdgeInsets.only(bottom: 50),
+            child: Form(
+              key: formkey,
+              child: Column(
+                children: [
+                  const SizedBox(height: 70),
+                  CustomTextField(
+                    controller: emailController,
+                    prefixIcon: Icons.email_outlined,
+                    labelText: 'Email Address',
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter your email';
+                      }
+                      if (!value.contains('@')) {
+                        return 'Please enter a valid email';
+                      }
+                      return null;
+                    },
                   ),
-                ),
+                  const SizedBox(height: 10),
+                  CustomTextField(
+                    controller: passwordController,
+                    prefixIcon: Icons.lock_outline,
+                    suffixIcon: isPasswordObscure
+                        ? Icons.visibility_outlined
+                        : Icons.visibility_off_outlined,
+                    obscureText: isPasswordObscure,
+                    onSuffixPressed: () {
+                      setState(() {
+                        isPasswordObscure = !isPasswordObscure;
+                      });
+                    },
+                    labelText: 'Password',
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter your password';
+                      }
+                      if (value.length < 6) {
+                        return 'Password must be at least 6 characters';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 25),
+                  state is LoginLoading
+                      ? const Center(
+                          child: CircularProgressIndicator(
+                            color: Color(0xFF0865FE),
+                          ),
+                        )
+                      : CustomButton(
+                          text: 'Log in',
+                          boxColor: const Color(0xFF0865FE),
+                          textColor: Colors.white,
+                          onTap: () {
+                            if (formkey.currentState!.validate()) {
+                              BlocProvider.of<AuthCubit>(context).loginUser(
+                                email: emailController.text.trim(),
+                                password: passwordController.text.trim(),
+                              );
+                            }
+                          },
+                        ),
+                  const SizedBox(height: 230),
+                  CustomButton(
+                    onTap: () {
+                      UserData newUser = UserData();
+                      Navigator.pushNamed(
+                        context,
+                        NamePage.id,
+                        arguments: newUser,
+                      );
+                    },
+                    text: 'Create an account',
+                    boxColor: const Color(kprimaryColor),
+                    textColor: const Color(0xFF0865FE),
+                  ),
+                ],
               ),
-            ],
-            const SizedBox(height: 10),
-            CustomButton(
-              text: isLoading ? 'Loading..' : 'Log in',
-              boxColor: Color(0xFF0865FE),
-              textColor: Colors.white,
-              onTap: isLoading ? null : login,
             ),
-            const SizedBox(height: 230),
-            CustomButton(
-              onTap: () {
-                UserData newUser = UserData();
-                Navigator.pushNamed(context, NamePage.id, arguments: newUser);
-              },
-              text: 'Create an account',
-              boxColor: Color(kprimaryColor),
-              textColor: Color(0xFF0865FE),
-            ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 }
-

@@ -141,6 +141,6 @@ class _MenuPageState extends State<MenuPage> {
         },
       ),
       bottomNavigationBar: BottomNavBar(currentIndex: 2),
-    );
+     );
   }
 }

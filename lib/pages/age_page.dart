@@ -16,95 +16,86 @@ class AgePage extends StatefulWidget {
 }
 
 class _AgePageState extends State<AgePage> {
+  final GlobalKey<FormState> formKey = GlobalKey();
   final TextEditingController ageController = TextEditingController();
-  String? errMessage;
-  
-  
-  void validateAndProceed(UserData userData) {
-
-    if(ageController.text.isEmpty){
-      setState(() {
-        errMessage = 'Please enter a valid number';
-      });
-      return;
-    }
-    setState(() {
-      errMessage = null;
-    });
-
-    userData.age = int.tryParse(ageController.text);
-    Navigator.pushNamed(context, EmailPage.id, arguments: userData);
-  }
 
   @override
   void dispose() {
-    // Important: release memory for controllers
     ageController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    //recive datauser from Namepage
     final userData = ModalRoute.of(context)!.settings.arguments as UserData;
+
     return Scaffold(
-      backgroundColor: Color(kprimaryColor),
+      backgroundColor: const Color(0xFF0C151A),
       appBar: AppBar(
-        backgroundColor: Color(kprimaryColor),
+        backgroundColor: const Color(0xFF0C151A),
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.white),
-        automaticallyImplyLeading: true,
       ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Text(
-              "How old are you?",
-              style: TextStyle(color: Colors.white, fontSize: 24),
-            ),
-          ),
-
-          const SizedBox(height: 20),
-          CustomTextField(
-            hintText: 'Age',
-            controller: ageController,
-            hasError: errMessage != null,
-          ),
-          const SizedBox(height: 10),
-          if (errMessage != null) ...[
-            const SizedBox(height: 5),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
+      body: Form(
+        key: formKey,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20),
               child: Text(
-                errMessage!,
-                style: TextStyle(color: Colors.red, fontSize: 14),
+                "How old are you?",
+                style: TextStyle(
+                  color: Colors.white, 
+                  fontSize: 24, 
+                  fontWeight: FontWeight.bold
+                ),
               ),
             ),
+            const SizedBox(height: 20),
+            CustomTextField(
+              labelText: 'Age',
+              controller: ageController,
+              prefixIcon: Icons.calendar_month_outlined,
+              keyboardType: TextInputType.number, 
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter your age';
+                }
+                if (int.tryParse(value) == null) {
+                  return 'Please enter a valid number';
+                }
+                return null;
+              },
+            ),
+            const SizedBox(height: 20),
+            CustomButton(
+              text: 'Next',
+              boxColor: const Color(0xFF0865FE),
+              textColor: Colors.white,
+              onTap: () {
+                if (formKey.currentState!.validate()) {
+                  userData.age = int.tryParse(ageController.text);
+                  Navigator.pushNamed(context, EmailPage.id, arguments: userData);
+                }
+              },
+            ),
+            const Spacer(),
+            CustomButton(
+              text: 'Already have an account',
+              boxColor: const Color(kprimaryColor),
+              textColor: const Color(0xFF0865FE),
+              onTap: () {
+                Navigator.pushNamedAndRemoveUntil(
+                  context,
+                  LoginPage.id,
+                  (route) => false,
+                );
+              },
+            ),
+            const SizedBox(height: 35),
           ],
-          const SizedBox(height: 10),
-          CustomButton(
-            text: 'Next',
-            boxColor: Color(0xFF0865FE),
-            textColor: Colors.white,
-            onTap:  () => validateAndProceed(userData),
-          ),
-          const Spacer(),
-          CustomButton(
-            text: 'already have account',
-            boxColor: Color(kprimaryColor),
-            textColor: Color(0xFF0865FE),
-            onTap: () {
-              Navigator.pushNamedAndRemoveUntil(
-                context,
-                LoginPage.id,
-                (route) => false,
-              );
-            },
-          ),
-          const SizedBox(height: 35),
-        ],
+        ),
       ),
     );
   }
