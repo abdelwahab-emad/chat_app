@@ -4,6 +4,7 @@ import 'package:chat_app/pages/home_page.dart';
 import 'package:chat_app/pages/name_page.dart';
 import 'package:chat_app/widgets/custom_button.dart';
 import 'package:chat_app/widgets/custom_text_field.dart';
+import 'package:chat_app/widgets/login_app_bar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -68,35 +69,15 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: true,
       backgroundColor: Color(0xFF0C151A),
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(220),
+        child: LoginAppBar(),
+      ),
       body: SingleChildScrollView(
         padding: EdgeInsets.only(bottom: 50),
         child: Column(
           children: [
-            Container(
-              height: 250,
-              decoration: const BoxDecoration(
-                color: Color(0xFF0865FE),
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(150),
-                  bottomRight: Radius.circular(150),
-                ),
-              ),
-              child: const Padding(
-                padding: EdgeInsets.only(top: 30),
-                child: Center(
-                  child: Text(
-                    'Chat App',
-                    style: TextStyle(
-                      fontSize: 24,
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
-            ),
             const SizedBox(height: 70),
             CustomTextField(
               hintText: 'email address',
@@ -147,3 +128,4 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 }
+
