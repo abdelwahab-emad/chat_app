@@ -3,6 +3,7 @@ import 'package:chat_app/cubits/auth_cubit/auth_cubit.dart';
 import 'package:chat_app/models/user_data.dart';
 import 'package:chat_app/pages/home_page.dart';
 import 'package:chat_app/pages/login_page.dart';
+import 'package:chat_app/pages/main_layout_page.dart';
 import 'package:chat_app/widgets/custom_button.dart';
 import 'package:chat_app/widgets/custom_snackbar.dart';
 import 'package:chat_app/widgets/custom_text_field.dart';
@@ -56,7 +57,7 @@ class _PasswordPageState extends State<PasswordPage> {
             if (!context.mounted) return;
             Navigator.pushNamedAndRemoveUntil(
               context,
-              HomePage.id,
+              MainLayoutPage.id,
               (route) => false,
             );
           } catch (e) {

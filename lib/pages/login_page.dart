@@ -2,6 +2,7 @@ import 'package:chat_app/constants.dart';
 import 'package:chat_app/cubits/auth_cubit/auth_cubit.dart';
 import 'package:chat_app/models/user_data.dart';
 import 'package:chat_app/pages/home_page.dart';
+import 'package:chat_app/pages/main_layout_page.dart';
 import 'package:chat_app/pages/name_page.dart';
 import 'package:chat_app/widgets/custom_button.dart';
 import 'package:chat_app/widgets/custom_snackbar.dart';
@@ -39,7 +40,7 @@ class _LoginPageState extends State<LoginPage> {
         if (state is LoginSuccess) {
           Navigator.pushNamedAndRemoveUntil(
             context,
-            HomePage.id,
+            MainLayoutPage.id,
             (route) => false,
           );
         } else if (state is LoginFailure) {
@@ -50,7 +51,7 @@ class _LoginPageState extends State<LoginPage> {
         return Scaffold(
           backgroundColor: const Color(0xFF0C151A),
           appBar: PreferredSize(
-            preferredSize: Size.fromHeight(220),
+            preferredSize: Size.fromHeight(200),
             child: LoginAppBar(),
           ),
           body: SingleChildScrollView(

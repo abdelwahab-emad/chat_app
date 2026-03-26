@@ -8,6 +8,7 @@ class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
 
   static String id = 'Profile_page';
+
   @override
   State<ProfilePage> createState() => _ProfilePageState();
 }
@@ -30,9 +31,9 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Future<void> updateProfile() async {
     if (firstNameController.text.isEmpty || surnameController.text.isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Please fill all fields')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please fill all fields')),
+      );
       return;
     }
 
@@ -45,9 +46,9 @@ class _ProfilePageState extends State<ProfilePage> {
           .collection('users')
           .doc(user.uid)
           .update({
-            'firstName': firstNameController.text.trim(),
-            'surName': surnameController.text.trim(),
-          });
+        'firstName': firstNameController.text.trim(),
+        'surName': surnameController.text.trim(),
+      });
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -59,9 +60,9 @@ class _ProfilePageState extends State<ProfilePage> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e')),
+        );
       }
     }
 
@@ -77,14 +78,15 @@ class _ProfilePageState extends State<ProfilePage> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        automaticallyImplyLeading: true,
-        iconTheme: IconThemeData(color: Color(skprimaryColor)),
-        title: Text(
+        automaticallyImplyLeading: false,
+        title: const Text(
           'Edit Profile',
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
-
       body: FutureBuilder<DocumentSnapshot>(
         future: FirebaseFirestore.instance
             .collection('users')
@@ -97,111 +99,124 @@ class _ProfilePageState extends State<ProfilePage> {
 
           if (snapshot.hasData && firstNameController.text.isEmpty) {
             final data = snapshot.data!.data() as Map<String, dynamic>;
-            firstNameController.text = data['firstName'];
-            surnameController.text = data['surName'];
-            emailController.text = data['email'];
+            firstNameController.text = data['firstName'] ?? '';
+            surnameController.text = data['surName'] ?? '';
+            emailController.text = data['email'] ?? '';
           }
 
-          return Column(
-            children: [
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      Stack(
-                        children: [
-                          CircleAvatar(
-                            radius: 60,
-                            backgroundColor: Colors.grey.shade200,
-                            child: Text(
-                              firstNameController.text[0].toUpperCase(),
-                              style: const TextStyle(
-                                fontSize: 40,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-
-                          Positioned(
-                            bottom: 0,
-                            right: 0,
-                            child: Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: const BoxDecoration(
-                                color: Colors.white,
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Icon(
-                                Icons.camera_alt,
-                                color: Colors.black,
-                                size: 25,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-
-                      const SizedBox(height: 40),
-
-                      CustomTextField(
-                        controller: firstNameController,
-                        hintText: 'First Name',
-                        prefixIcon: Icons.person,
-                        textColor: Colors.black,
-                      ),
-
-                      SizedBox(height: 20),
-
-                      CustomTextField(
-                        controller: surnameController,
-                        hintText: 'SurName',
-                        prefixIcon: Icons.person,
-                        textColor: Colors.black,
-                      ),
-
-                      SizedBox(height: 20),
-
-                      CustomTextField(
-                        controller: emailController,
-                        hintText: 'Email Address',
-                        prefixIcon: Icons.email,
-                        readOnly: true,
-                        textColor: Colors.black,
-                      ),
-
-                      SizedBox(height: 200),
-                      Padding(
-                        padding: const EdgeInsets.all(24.0),
-                        child: SizedBox(
-                          width: double.infinity,
-                          height: 55,
-                          child: ElevatedButton(
-                            onPressed: isLoading ? null : updateProfile,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(skprimaryColor),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              elevation: 2,
-                            ),
-                            child: isLoading
-                                ? const CircularProgressIndicator()
-                                : const Text(
-                                    'Save Changes',
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                          ),
+          return SingleChildScrollView(
+            child: Column(
+              children: [
+                const SizedBox(height: 20),
+                Stack(
+                  children: [
+                    CircleAvatar(
+                      radius: 60,
+                      backgroundColor: Colors.grey.shade200,
+                      child: Text(
+                        firstNameController.text.isNotEmpty
+                            ? firstNameController.text[0].toUpperCase()
+                            : '',
+                        style: const TextStyle(
+                          fontSize: 40,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF0865FE),
                         ),
                       ),
-                    ],
+                    ),
+                    Positioned(
+                      bottom: 0,
+                      right: 0,
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black12,
+                              blurRadius: 4,
+                            ),
+                          ],
+                        ),
+                        child: const Icon(
+                          Icons.camera_alt,
+                          color: Colors.black,
+                          size: 25,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 40),
+                CustomTextField(
+                  controller: firstNameController,
+                  hintText: 'First Name',
+                  prefixIcon: Icons.person,
+                  textColor: Colors.black,
+                ),
+                const SizedBox(height: 20),
+                CustomTextField(
+                  controller: surnameController,
+                  hintText: 'Surname',
+                  prefixIcon: Icons.person,
+                  textColor: Colors.black,
+                ),
+                const SizedBox(height: 20),
+                CustomTextField(
+                  controller: emailController,
+                  hintText: 'Email Address',
+                  prefixIcon: Icons.email,
+                  readOnly: true,
+                  textColor: Colors.black,
+                ),
+                const SizedBox(height: 50),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: 55,
+                    child: ElevatedButton(
+                      onPressed: isLoading ? null : updateProfile,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF0865FE),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 2,
+                      ),
+                      child: isLoading
+                          ? const CircularProgressIndicator(color: Colors.white)
+                          : const Text(
+                              'Save Changes',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                    ),
                   ),
                 ),
-              ),
-            ],
+                const SizedBox(height: 20),
+                TextButton(
+                  onPressed: () async {
+                    await FirebaseAuth.instance.signOut();
+                    if (mounted) {
+                      Navigator.pushNamedAndRemoveUntil(
+                          context, 'login_page', (route) => false);
+                    }
+                  },
+                  child: const Text(
+                    'Logout',
+                    style: TextStyle(
+                      color: Colors.red,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           );
         },
       ),

@@ -1,6 +1,5 @@
 import 'package:chat_app/constants.dart';
 import 'package:chat_app/pages/chat_page.dart';
-import 'package:chat_app/widgets/bottom_nav_bar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -49,7 +48,6 @@ class _HomePageState extends State<HomePage> {
           }
 
           final myData = snapshot.data!.data() as Map<String, dynamic>;
-
           final friendsIds = List<String>.from(myData['friends'] ?? []);
 
           if (friendsIds.isEmpty) {
@@ -110,7 +108,7 @@ class _HomePageState extends State<HomePage> {
                     },
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12), 
-                      decoration: BoxDecoration(color: Colors.white),
+                      decoration: const BoxDecoration(color: Colors.white),
                       child: Row(
                         children: [
                           CircleAvatar(
@@ -125,9 +123,7 @@ class _HomePageState extends State<HomePage> {
                               ),
                             ),
                           ),
-
                           const SizedBox(width: 15),
-
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -167,7 +163,6 @@ class _HomePageState extends State<HomePage> {
           );
         },
       ),
-      bottomNavigationBar: BottomNavBar(currentIndex: 0),
     );
   }
 }

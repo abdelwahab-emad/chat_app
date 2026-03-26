@@ -1,5 +1,4 @@
 import 'package:chat_app/constants.dart';
-import 'package:chat_app/widgets/bottom_nav_bar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -14,7 +13,6 @@ class PeoplePage extends StatefulWidget {
 
 class _PeoplePageState extends State<PeoplePage> {
   final currentUserId = FirebaseAuth.instance.currentUser!.uid;
-
   List<String> friends = [];
   List<String> sentRequests = [];
 
@@ -30,22 +28,19 @@ class _PeoplePageState extends State<PeoplePage> {
         .doc(currentUserId)
         .get();
 
-    final data = doc.data()!;
-    setState(() {
-      friends = List<String>.from(data['friends'] ?? []);
-      sentRequests = List<String>.from(data['sentRequests'] ?? []);
-    });
+    if (doc.exists) {
+      final data = doc.data()!;
+      setState(() {
+        friends = List<String>.from(data['friends'] ?? []);
+        sentRequests = List<String>.from(data['sentRequests'] ?? []);
+      });
+    }
   }
 
-  /// Send friend request
   Future<void> sendRequest(String userId) async {
     await FirebaseFirestore.instance.runTransaction((tx) async {
-      final myRef = FirebaseFirestore.instance
-          .collection('users')
-          .doc(currentUserId);
-      final otherRef = FirebaseFirestore.instance
-          .collection('users')
-          .doc(userId);
+      final myRef = FirebaseFirestore.instance.collection('users').doc(currentUserId);
+      final otherRef = FirebaseFirestore.instance.collection('users').doc(userId);
 
       tx.update(myRef, {
         'sentRequests': FieldValue.arrayUnion([userId]),
@@ -55,19 +50,13 @@ class _PeoplePageState extends State<PeoplePage> {
         'receivedRequests': FieldValue.arrayUnion([currentUserId]),
       });
     });
-
     loadMyData();
   }
 
-  /// Remove friend
   Future<void> removeFriend(String userId) async {
     await FirebaseFirestore.instance.runTransaction((tx) async {
-      final myRef = FirebaseFirestore.instance
-          .collection('users')
-          .doc(currentUserId);
-      final otherRef = FirebaseFirestore.instance
-          .collection('users')
-          .doc(userId);
+      final myRef = FirebaseFirestore.instance.collection('users').doc(currentUserId);
+      final otherRef = FirebaseFirestore.instance.collection('users').doc(userId);
 
       tx.update(myRef, {
         'friends': FieldValue.arrayRemove([userId]),
@@ -77,7 +66,6 @@ class _PeoplePageState extends State<PeoplePage> {
         'friends': FieldValue.arrayRemove([currentUserId]),
       });
     });
-
     loadMyData();
   }
 
@@ -98,7 +86,7 @@ class _PeoplePageState extends State<PeoplePage> {
           ),
         ),
       ),
-      body: FutureBuilder(
+      body: FutureBuilder<QuerySnapshot>(
         future: FirebaseFirestore.instance.collection('users').get(),
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
@@ -109,6 +97,7 @@ class _PeoplePageState extends State<PeoplePage> {
 
           return ListView.builder(
             itemCount: users.length,
+            padding: const EdgeInsets.symmetric(vertical: 8),
             itemBuilder: (context, index) {
               final user = users[index];
 
@@ -116,9 +105,8 @@ class _PeoplePageState extends State<PeoplePage> {
                 return const SizedBox.shrink();
               }
 
-              final data = user.data();
-              final name = '${data['firstName']} ${data['surName']}'.trim();
-
+              final data = user.data() as Map<String, dynamic>;
+              final name = '${data['firstName'] ?? ''} ${data['surName'] ?? ''}'.trim();
               final isFriend = friends.contains(user.id);
               final isPending = sentRequests.contains(user.id);
 
@@ -141,40 +129,44 @@ class _PeoplePageState extends State<PeoplePage> {
               }
 
               return Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                 child: Row(
                   children: [
                     CircleAvatar(
-                      radius: 30,
+                      radius: 26,
                       backgroundColor: Colors.grey.shade200,
                       child: Text(
-                        name[0].toUpperCase(),
+                        name.isNotEmpty ? name[0].toUpperCase() : '?',
                         style: const TextStyle(
-                          fontSize: 24,
+                          fontSize: 20,
                           fontWeight: FontWeight.bold,
-                          color: Color(skprimaryColor),
+                          color: Color(0xFF0865FE),
                         ),
                       ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
-                        name.isEmpty ? 'Unknown' : name,
-                        style: const TextStyle(fontSize: 18),
+                        name.isEmpty ? 'Unknown User' : name,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black87,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
+                    const SizedBox(width: 10),
                     SizedBox(
-                      width: 120,
+                      width: 100,
                       height: 36,
                       child: ElevatedButton(
                         onPressed: onTap,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: buttonColor,
                           elevation: 0,
-
+                          padding: EdgeInsets.zero,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
@@ -182,11 +174,9 @@ class _PeoplePageState extends State<PeoplePage> {
                         child: Text(
                           buttonText,
                           style: TextStyle(
-                            color: isFriend || isPending
-                                ? Colors.black
-                                : Colors.white,
+                            color: isFriend || isPending ? Colors.black : Colors.white,
                             fontWeight: FontWeight.bold,
-                            fontSize: 14,
+                            fontSize: 13,
                           ),
                         ),
                       ),
@@ -198,7 +188,6 @@ class _PeoplePageState extends State<PeoplePage> {
           );
         },
       ),
-      bottomNavigationBar: BottomNavBar(currentIndex: 1),
     );
   }
 }

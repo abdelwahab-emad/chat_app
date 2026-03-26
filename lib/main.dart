@@ -1,8 +1,10 @@
 import 'package:chat_app/cubits/auth_cubit/auth_cubit.dart';
+import 'package:chat_app/cubits/bottom_nav_cubit/bottom_nav_cubit.dart';
 import 'package:chat_app/firebase_options.dart';
 import 'package:chat_app/pages/age_page.dart';
 import 'package:chat_app/pages/chat_page.dart';
 import 'package:chat_app/pages/email_page.dart';
+import 'package:chat_app/pages/main_layout_page.dart';
 import 'package:chat_app/pages/menu_page.dart';
 import 'package:chat_app/pages/people_page.dart';
 import 'package:chat_app/pages/home_page.dart';
@@ -31,6 +33,7 @@ class ChatApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (context) => AuthCubit()),
+        BlocProvider(create: (context) => BottomNavCubit()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -47,6 +50,7 @@ class ChatApp extends StatelessWidget {
           ChatPage.id : (context) => ChatPage(),
           ProfilePage.id : (context) => ProfilePage(),
           RequestsPage.id : (context) => RequestsPage(),
+          MainLayoutPage.id : (context) => MainLayoutPage(),
         },
         initialRoute: LoginPage.id,
       ),
