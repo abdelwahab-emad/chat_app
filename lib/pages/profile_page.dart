@@ -19,7 +19,42 @@ class _ProfilePageState extends State<ProfilePage> {
   final TextEditingController emailController = TextEditingController();
 
   final user = FirebaseAuth.instance.currentUser!;
-  bool isLoading = false;
+  bool isSaving = false;
+  bool isFetching = true;
+
+  @override
+  void initState() {
+    super.initState();
+    loadUserData();
+  }
+
+  Future<void> loadUserData() async {
+    try {
+      final doc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get();
+
+      if (doc.exists) {
+        final data = doc.data() as Map<String, dynamic>;
+        firstNameController.text = data['firstName'] ?? '';
+        surnameController.text = data['surName'] ?? '';
+        emailController.text = data['email'] ?? '';
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error loading data: $e')),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          isFetching = false;
+        });
+      }
+    }
+  }
 
   @override
   void dispose() {
@@ -38,7 +73,7 @@ class _ProfilePageState extends State<ProfilePage> {
     }
 
     setState(() {
-      isLoading = true;
+      isSaving = true;
     });
 
     try {
@@ -67,7 +102,7 @@ class _ProfilePageState extends State<ProfilePage> {
     }
 
     setState(() {
-      isLoading = false;
+      isSaving = false;
     });
   }
 
@@ -78,7 +113,8 @@ class _ProfilePageState extends State<ProfilePage> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        automaticallyImplyLeading: false,
+        automaticallyImplyLeading: true,
+        iconTheme: const IconThemeData(color: Colors.black),
         title: const Text(
           'Edit Profile',
           style: TextStyle(
@@ -87,139 +123,105 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
         ),
       ),
-      body: FutureBuilder<DocumentSnapshot>(
-        future: FirebaseFirestore.instance
-            .collection('users')
-            .doc(user.uid)
-            .get(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          if (snapshot.hasData && firstNameController.text.isEmpty) {
-            final data = snapshot.data!.data() as Map<String, dynamic>;
-            firstNameController.text = data['firstName'] ?? '';
-            surnameController.text = data['surName'] ?? '';
-            emailController.text = data['email'] ?? '';
-          }
-
-          return SingleChildScrollView(
-            child: Column(
-              children: [
-                const SizedBox(height: 20),
-                Stack(
-                  children: [
-                    CircleAvatar(
-                      radius: 60,
-                      backgroundColor: Colors.grey.shade200,
-                      child: Text(
-                        firstNameController.text.isNotEmpty
-                            ? firstNameController.text[0].toUpperCase()
-                            : '',
-                        style: const TextStyle(
-                          fontSize: 40,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF0865FE),
+      body: isFetching
+          ? const Center(child: CircularProgressIndicator())
+          : SingleChildScrollView(
+              child: Column(
+                children: [
+                  const SizedBox(height: 20),
+                  Stack(
+                    children: [
+                      CircleAvatar(
+                        radius: 60,
+                        backgroundColor: Colors.grey.shade200,
+                        child: Text(
+                          firstNameController.text.isNotEmpty
+                              ? firstNameController.text[0].toUpperCase()
+                              : '',
+                          style: const TextStyle(
+                            fontSize: 40,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF0865FE),
+                          ),
                         ),
                       ),
-                    ),
-                    Positioned(
-                      bottom: 0,
-                      right: 0,
-                      child: Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: const BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black12,
-                              blurRadius: 4,
-                            ),
-                          ],
-                        ),
-                        child: const Icon(
-                          Icons.camera_alt,
-                          color: Colors.black,
-                          size: 25,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 40),
-                CustomTextField(
-                  controller: firstNameController,
-                  hintText: 'First Name',
-                  prefixIcon: Icons.person,
-                  textColor: Colors.black,
-                ),
-                const SizedBox(height: 20),
-                CustomTextField(
-                  controller: surnameController,
-                  hintText: 'Surname',
-                  prefixIcon: Icons.person,
-                  textColor: Colors.black,
-                ),
-                const SizedBox(height: 20),
-                CustomTextField(
-                  controller: emailController,
-                  hintText: 'Email Address',
-                  prefixIcon: Icons.email,
-                  readOnly: true,
-                  textColor: Colors.black,
-                ),
-                const SizedBox(height: 50),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: SizedBox(
-                    width: double.infinity,
-                    height: 55,
-                    child: ElevatedButton(
-                      onPressed: isLoading ? null : updateProfile,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF0865FE),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        elevation: 2,
-                      ),
-                      child: isLoading
-                          ? const CircularProgressIndicator(color: Colors.white)
-                          : const Text(
-                              'Save Changes',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
+                      Positioned(
+                        bottom: 0,
+                        right: 0,
+                        child: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black12,
+                                blurRadius: 4,
                               ),
-                            ),
+                            ],
+                          ),
+                          child: const Icon(
+                            Icons.camera_alt,
+                            color: Colors.black,
+                            size: 25,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 40),
+                  CustomTextField(
+                    controller: firstNameController,
+                    hintText: 'First Name',
+                    prefixIcon: Icons.person,
+                    textColor: Colors.black,
+                  ),
+                  const SizedBox(height: 20),
+                  CustomTextField(
+                    controller: surnameController,
+                    hintText: 'Surname',
+                    prefixIcon: Icons.person,
+                    textColor: Colors.black,
+                  ),
+                  const SizedBox(height: 20),
+                  CustomTextField(
+                    controller: emailController,
+                    hintText: 'Email Address',
+                    prefixIcon: Icons.email,
+                    readOnly: true,
+                    textColor: Colors.black,
+                  ),
+                  const SizedBox(height: 50),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    child: SizedBox(
+                      width: double.infinity,
+                      height: 55,
+                      child: ElevatedButton(
+                        onPressed: isSaving ? null : updateProfile,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF0865FE),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          elevation: 2,
+                        ),
+                        child: isSaving
+                            ? const CircularProgressIndicator(color: Colors.white)
+                            : const Text(
+                                'Save Changes',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 20),
-                TextButton(
-                  onPressed: () async {
-                    await FirebaseAuth.instance.signOut();
-                    if (mounted) {
-                      Navigator.pushNamedAndRemoveUntil(
-                          context, 'login_page', (route) => false);
-                    }
-                  },
-                  child: const Text(
-                    'Logout',
-                    style: TextStyle(
-                      color: Colors.red,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
-          );
-        },
-      ),
     );
   }
 }

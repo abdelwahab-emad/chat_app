@@ -2,7 +2,6 @@ import 'package:chat_app/constants.dart';
 import 'package:chat_app/pages/login_page.dart';
 import 'package:chat_app/pages/profile_page.dart';
 import 'package:chat_app/pages/requests_page.dart';
-import 'package:chat_app/widgets/bottom_nav_bar.dart';
 import 'package:chat_app/widgets/menu_item.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -111,7 +110,6 @@ class _MenuPageState extends State<MenuPage> {
                 ),
               ),
               const SizedBox(height: 10),
-
               MenuItem(
                 title: 'Profile',
                 icon: Icons.person_outline,
@@ -119,7 +117,6 @@ class _MenuPageState extends State<MenuPage> {
                   Navigator.pushNamed(context, ProfilePage.id);
                 },
               ),
-
               MenuItem(
                 title: 'Friend Requests',
                 icon: Icons.group_add_outlined,
@@ -129,7 +126,6 @@ class _MenuPageState extends State<MenuPage> {
                 },
               ),
               const Divider(thickness: 1, indent: 20, endIndent: 20),
-
               MenuItem(
                 icon: Icons.logout,
                 title: 'Sign Out',
@@ -140,7 +136,6 @@ class _MenuPageState extends State<MenuPage> {
           );
         },
       ),
-      bottomNavigationBar: BottomNavBar(currentIndex: 2),
-     );
+    );
   }
 }

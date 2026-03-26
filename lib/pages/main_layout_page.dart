@@ -1,10 +1,10 @@
+import 'package:chat_app/pages/menu_page.dart';
 import 'package:chat_app/pages/people_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:chat_app/cubits/bottom_nav_cubit/bottom_nav_cubit.dart';
 import 'package:chat_app/cubits/bottom_nav_cubit/bottom_nav_states.dart';
 import 'package:chat_app/pages/home_page.dart';
-import 'package:chat_app/pages/profile_page.dart';
 
 class MainLayoutPage extends StatelessWidget {
   static const String id = 'main_layout_page';
@@ -12,7 +12,7 @@ class MainLayoutPage extends StatelessWidget {
   final List<Widget> _pages = const [
     HomePage(),
     PeoplePage(),
-    ProfilePage(),
+    MenuPage(),
   ];
 
   const MainLayoutPage({super.key});
