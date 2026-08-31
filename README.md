@@ -1,16 +1,38 @@
-# chat_app
+# 💬 Chat App
 
-A new Flutter project.
+Chat App is a cross-platform messaging app built with Flutter and Firebase. It lets users sign up, add friends, and chat privately — only with people on their friends list, not with the entire user base.
 
-## Getting Started
+The app runs on Android, iOS, Web, Windows, macOS, and Linux from a single codebase.
 
-This project is a starting point for a Flutter application.
+## ✨ Features
 
-A few resources to get you started if this is your first Flutter project:
+- **Authentication** — sign up, log in, and log out via Firebase Auth
+- **Friends system** — send/add friend requests and remove friends from your list
+- **Private chat** — chat only with users you've added as friends
+- **Profile editing** — update your profile information (no profile picture support yet)
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## ⚙️ Technical Highlights
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- **State management:** built with Flutter's built-in `setState` — no external state management package
+- **Backend:** Firebase (Authentication, Cloud Firestore) for user data, friend relationships, and real-time messaging
+- **Cross-platform:** single Flutter codebase targeting mobile, web, and desktop
+
+## 🧰 Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Framework | Flutter (Dart) |
+| State Management | setState |
+| Backend / Database | Firebase Cloud Firestore |
+| Authentication | Firebase Auth |
+
+## 📁 Project Structure
+
+```
+lib/
+├── models/          # Data models (User, Message, Friend)
+├── pages/           # UI screens (login, chat list, chat, profile)
+├── widgets/         # Reusable UI components
+├── constants.dart   # App-wide constants
+└── main.dart        # App entry point
+```
