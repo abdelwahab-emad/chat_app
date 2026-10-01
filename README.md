@@ -13,17 +13,11 @@ The app runs on Android, iOS, Web, Windows, macOS, and Linux from a single codeb
 
 ## 📱 Screenshots
 
-| Login | Name | Age | Email |
-| :---: | :---: | :---: | :---: |
-| <img src="screenshots/login_page.jpeg" width="180" /> | <img src="screenshots/name_page.jpeg" width="180" /> | <img src="screenshots/age_page.jpeg" width="180" /> | <img src="screenshots/email_page.jpeg" width="180" /> |
+> Scroll sideways to see all screens →
 
-| Password | Home | Chat | Menu |
-| :---: | :---: | :---: | :---: |
-| <img src="screenshots/password_page.jpeg" width="180" /> | <img src="screenshots/home_page.jpeg" width="180" /> | <img src="screenshots/chat_page.jpeg" width="180" /> | <img src="screenshots/menu_page.jpeg" width="180" /> |
-
-| People | Requests | Profile |
-| :---: | :---: | :---: |
-| <img src="screenshots/people_page.jpeg" width="180" /> | <img src="screenshots/requests_page.jpeg" width="180" /> | <img src="screenshots/profile_page.jpeg" width="180" /> |
+| Login | Name | Age | Email | Password | Home | Chat | Menu | People | Requests | Profile |
+| :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| <img src="screenshots/login_page.jpeg" width="200" /> | <img src="screenshots/name_page.jpeg" width="200" /> | <img src="screenshots/age_page.jpeg" width="200" /> | <img src="screenshots/email_page.jpeg" width="200" /> | <img src="screenshots/password_page.jpeg" width="200" /> | <img src="screenshots/home_page.jpeg" width="200" /> | <img src="screenshots/chat_page.jpeg" width="200" /> | <img src="screenshots/menu_page.jpeg" width="200" /> | <img src="screenshots/people_page.jpeg" width="200" /> | <img src="screenshots/requests_page.jpeg" width="200" /> | <img src="screenshots/profile_page.jpeg" width="200" /> |
 
 ## ⚙️ Technical Highlights
 
@@ -49,3 +43,8 @@ lib/
 ├── widgets/         # Reusable UI components
 ├── constants.dart   # App-wide constants
 └── main.dart        # App entry point
+```
+
+---
+
+Made with ❤️ using Flutter.
